@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Finance ROI Dashboard - CFO Value Demonstrator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#0f1220;
+      --card:#161a2e;
+      --card-2:#1b2040;
+      --text:#e8edf7;
+      --muted:#a8b0c4;
+      --accent:#6be675;
+      --accent-2:#5cd1ff;
+      --warn:#ffb84d;
+      --danger:#ff6e6e;
+      --grid-gap:14px;
+      --radius:12px;
+      --shadow:0 8px 24px rgba(0,0,0,0.35);
+      --shadow-soft:0 2px 12px rgba(0,0,0,0.25);
+      --brand:#7a5cff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:linear-gradient(145deg, #0b0e1a, #131936);
+      color:var(--text);
+    }
+    header{
+      position:sticky; top:0; z-index:5;
+      background:rgba(11,14,26,0.7);
+      backdrop-filter: blur(12px);
+      border-bottom:1px solid rgba(255,255,255,0.06);
+    }
+    .wrap{max-width:1400px; margin:0 auto; padding:18px;}
+    .head{
+      display:flex; gap:16px; align-items:center; justify-content:space-between;
+    }
+    .title{
+      display:flex; align-items:center; gap:14px;
+    }
+    .logo{
+      width:38px; height:38px; border-radius:10px;
+      background: radial-gradient(110% 110% at 18% 20%, #7a5cff, #00c2ff 60%, transparent 61%),
+                  conic-gradient(from 220deg, #00f5a0, #00d9f5, #7a5cff, #00f5a0);
+      box-shadow:inset 0 0 18px rgba(255,255,255,0.15), 0 10px 25px rgba(0,0,0,0.35);
+    }
+    h1{font-size:20px; margin:0; font-weight:700; letter-spacing:0.2px}
+    .subtitle{color:var(--muted); font-size:12px;}
+    .actions{display:flex; gap:8px; flex-wrap:wrap}
+    button, .btn{
+      background:linear-gradient(180deg, #222a56,#1a2047);
+      border:1px solid rgba(255,255,255,0.08);
+      color:var(--text);
+      padding:10px 14px;
+      border-radius:10px;
+      cursor:pointer;
+      box-shadow:var(--shadow-soft);
+      transition:.2s ease;
+      font-weight:600;
+    }
+    button:hover{transform:translateY(-1px); box-shadow:0 6px 16px rgba(0,0,0,0.35)}
+    .btn-accent{ background:linear-gradient(180deg, #2dd186, #1fb46c); border-color:rgba(0,0,0,0.2); color:#08170e}
+    .btn-ghost{ background:transparent; border:1px dashed rgba(255,255,255,0.18)}
+    .grid{
+      display:grid; gap:var(--grid-gap);
+      grid-template-columns: 370px 1fr;
+      align-items:start;
+      padding:18px;
+      max-width:1400px; margin:0 auto;
+    }
+    .panel{
+      background:linear-gradient(180deg, var(--card), var(--card-2));
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .panel h3{
+      margin:0 0 12px 0; font-size:13px; letter-spacing:.3px;
+      color:#cfd6ee; text-transform:uppercase;
+    }
+    .panel .section{
+      border-top:1px solid rgba(255,255,255,0.06);
+      padding:14px 14px;
+    }
+    .panel .section:first-child{border-top:0; padding-top:16px}
+    .inputs{
+      display:grid; gap:10px;
+      grid-template-columns: 1fr 1fr;
+    }
+    .inputs.full{grid-template-columns:1fr}
+    .field{
+      display:flex; flex-direction:column; gap:6px;
+      background:rgba(0,0,0,0.15);
+      border:1px solid rgba(255,255,255,0.06);
+      padding:10px; border-radius:10px;
+    }
+    .field label{
+      font-size:12px; color:#c9d1ea; display:flex; align-items:center; gap:6px;
+    }
+    .tip{
+      color:#92a0c7; font-size:11px;
+    }
+    input[type="number"], input[type="text"], select{
+      width:100%; padding:9px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);
+      background:rgba(10,12,25,0.6); color:var(--text); outline:none;
+    }
+    input[type="range"]{width:100%}
+    .kpis{
+      display:grid; gap:var(--grid-gap);
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      padding:18px; max-width:1400px; margin:0 auto;
+    }
+    .kpi{
+      background:linear-gradient(180deg, #141932, #121733);
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:14px; padding:14px; box-shadow:var(--shadow-soft);
+    }
+    .kpi .label{font-size:12px; color:#aeb8d6}
+    .kpi .value{font-size:22px; font-weight:800; margin-top:6px}
+    .kpi .delta{font-size:12px; color:#89f2a0}
+    .charts{
+      display:grid; gap:var(--grid-gap);
+      grid-template-columns: 1.2fr 1fr;
+      padding:0 18px 18px 18px;
+      max-width:1400px; margin:0 auto;
+    }
+    .card{
+      background:linear-gradient(180deg, #131735, #10132b);
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:14px; padding:14px; box-shadow:var(--shadow);
+    }
+    .card h4{margin:0 0 8px 0; font-size:14px}
+    .legend{color:#aeb8d6; font-size:12px}
+    .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+    .qual{
+      display:grid; gap:var(--grid-gap);
+      grid-template-columns: 1fr 1fr;
+      padding:0 18px 18px 18px; max-width:1400px; margin:0 auto;
+    }
+    .note{color:#8fa0cd; font-size:12px; padding:0 18px 28px 18px; max-width:1200px; margin:0 auto}
+    .pill{
+      padding:4px 8px; border-radius:999px;
+      background:rgba(255,255,255,0.06); font-size:11px; color:#cbd4f0;
+    }
+    .flex{display:flex; align-items:center; gap:10px}
+    .monosmall{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New"; font-size:12px; color:#9fb0df}
+    .divider{height:1px; background:rgba(255,255,255,0.06); margin:8px 0}
+    .sc-actions{display:flex; gap:8px; flex-wrap:wrap}
+    .scenario-block{display:grid; gap:10px; grid-template-columns:1fr 1fr}
+    .scenario{
+      padding:10px; border:1px dashed rgba(255,255,255,0.15); border-radius:10px;
+      background:rgba(0,0,0,0.14);
+    }
+    .scenario h5{margin:0 0 8px 0}
+    .scenario .sval{font-weight:800; font-size:16px}
+    .foot{padding:12px 18px; color:#9fb0df; font-size:12px; opacity:0.9}
+    @media (max-width:1200px){
+      .kpis{grid-template-columns: repeat(3, 1fr)}
+      .charts{grid-template-columns: 1fr}
+      .qual{grid-template-columns: 1fr}
+      .grid{grid-template-columns: 1fr}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap head">
+      <div class="title">
+        <div class="logo"></div>
+        <div>
+          <h1>Return on Investment Calculator</h1>
+          <div class="subtitle">Demonstrate quantifiable ROI and qualitative value of your finance digital product</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-ghost" id="btnBase">Base</button>
+        <button class="btn-ghost" id="btnConservative">Conservative</button>
+        <button class="btn-ghost" id="btnAggressive">Aggressive</button>
+        <button class="btn" id="btnReset">Reset</button>
+        <button class="btn-accent" id="btnExport">Download Snapshot (PNG)</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="kpis">
+    <div class="kpi">
+      <div class="label">Payback Period</div>
+      <div class="value" id="kpiPayback">—</div>
+      <div class="delta monosmall">Target: <span class="pill" id="kpiPayTarget">≤ 18 months</span></div>
+    </div>
+    <div class="kpi">
+      <div class="label">IRR</div>
+      <div class="value" id="kpiIRR">—</div>
+      <div class="delta monosmall">Internal rate of return</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Annual Net Benefit (Yr 1)</div>
+      <div class="value" id="kpiANB">—</div>
+      <div class="delta monosmall" id="kpiANBNote"></div>
+    </div>
+    <div class="kpi">
+      <div class="label">Qualitative Value Index</div>
+      <div class="value" id="kpiQScore">—</div>
+      <div class="delta monosmall" id="kpiQNote"></div>
+    </div>
+  </section>
+
+  <section class="grid" id="dashboard">
+    <aside class="panel">
+      <div class="section">
+        <div class="row" style="justify-content:space-between"><h3>Currency & Horizon</h3><span class="pill">Assumptions</span></div>
+        <div class="inputs">
+          <div class="field">
+            <label>Currency</label>
+            <select id="currency">
+              <option value="$">$ (USD)</option>
+              <option value="€">€ (EUR)</option>
+              <option value="£">£ (GBP)</option>
+              <option value="₹">₹ (INR)</option>
+              <option value="R">R (ZAR)</option>
+              <option value="₨">₨ (MUR)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Horizon (years)</label>
+            <input type="number" id="horizon" min="1" max="5" value="3">
+          </div>
+          <div class="field">
+            <label>Discount rate (%)</label>
+            <input type="number" id="discountRate" min="0" max="100" step="0.1" value="10">
+          </div>
+          <div class="field">
+            <label>Payback target (months)</label>
+            <input type="number" id="paybackTarget" min="1" max="120" value="18">
+          </div>
+          <div class="field">
+            <label>Adoption Year 1 (%)</label>
+            <input type="number" id="adoptY1" min="0" max="100" value="70">
+          </div>
+          <div class="field">
+            <label>Adoption Year 2 (%)</label>
+            <input type="number" id="adoptY2" min="0" max="100" value="90">
+          </div>
+          <div class="field">
+            <label>Adoption Year 3 (%)</label>
+            <input type="number" id="adoptY3" min="0" max="100" value="100">
+          </div>
+          <div class="field" id="adoptY4Wrap" style="display:none">
+            <label>Adoption Year 4 (%)</label>
+            <input type="number" id="adoptY4" min="0" max="100" value="100">
+          </div>
+          <div class="field" id="adoptY5Wrap" style="display:none">
+            <label>Adoption Year 5 (%)</label>
+            <input type="number" id="adoptY5" min="0" max="100" value="100">
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="row" style="justify-content:space-between"><h3>Workforce & Efficiency</h3><span class="pill">Productivity</span></div>
+        <div class="inputs">
+          <div class="field">
+            <label>Finance FTEs (users)</label>
+            <input type="number" id="fte" min="1" value="20">
+          </div>
+          <div class="field">
+            <label>Loaded cost per FTE (annual)</label>
+            <input type="text" id="fteCost" value="120,000">
+          </div>
+          <div class="field">
+            <label>Hours saved per user per week</label>
+            <input type="number" id="hrsSaved" min="0" step="0.1" value="4">
+          </div>
+          <div class="field">
+            <label>Hours per FTE per year</label>
+            <input type="number" id="hrsPerYear" min="1" value="2080">
+          </div>
+        </div>
+        <div class="tip">Efficiency savings = users × hours saved × hourly cost × adoption</div>
+      </div>
+
+      <div class="section">
+        <div class="row" style="justify-content:space-between"><h3>Quality & Compliance</h3><span class="pill">Risk</span></div>
+        <div class="inputs">
+          <div class="field">
+            <label>Transactions per month</label>
+            <input type="number" id="txPerMonth" value="50000">
+          </div>
+          <div class="field">
+            <label>Current error rate (%)</label>
+            <input type="number" id="errorRate" min="0" max="100" step="0.01" value="2">
+          </div>
+          <div class="field">
+            <label>Error rate reduction (%)</label>
+            <input type="number" id="errorReduction" min="0" max="100" step="0.01" value="50">
+          </div>
+          <div class="field">
+            <label>Average cost per error</label>
+            <input type="text" id="costPerError" value="50">
+          </div>
+          <div class="field">
+            <label>Expected annual fines (baseline)</label>
+            <input type="text" id="annualFines" value="200,000">
+          </div>
+          <div class="field">
+            <label>Fine risk reduction (%)</label>
+            <input type="number" id="fineReduction" min="0" max="100" value="60">
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="row" style="justify-content:space-between"><h3>Working Capital & Revenue</h3><span class="pill">Top-line + WC</span></div>
+        <div class="inputs">
+          <div class="field">
+            <label>AR balance</label>
+            <input type="text" id="arBalance" value="50,000,000">
+          </div>
+          <div class="field">
+            <label>DSO reduction (days)</label>
+            <input type="number" id="dsoReduction" min="0" value="5">
+          </div>
+          <div class="field">
+            <label>Cost of capital (%)</label>
+            <input type="number" id="costOfCapital" min="0" max="100" step="0.1" value="8">
+          </div>
+          <div class="field">
+            <label>Annual revenue (baseline)</label>
+            <input type="text" id="annualRevenue" value="200,000,000">
+          </div>
+          <div class="field">
+            <label>Revenue leakage prevented (%)</label>
+            <input type="number" id="revLeakagePrevented" min="0" max="100" step="0.01" value="0.2">
+          </div>
+          <div class="field">
+            <label>Realization of revenue impact (%)</label>
+            <input type="number" id="revRealization" min="0" max="100" step="1" value="75">
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="row" style="justify-content:space-between"><h3>Costs</h3><span class="pill">Investment</span></div>
+        <div class="inputs">
+          <div class="field">
+            <label>Subscription (annual)</label>
+            <input type="text" id="subAnnual" value="350,000">
+          </div>
+          <div class="field">
+            <label>Maintenance/Support (annual)</label>
+            <input type="text" id="maintAnnual" value="50,000">
+          </div>
+          <div class="field">
+            <label>Implementation (one-time)</label>
+            <input type="text" id="implOneTime" value="250,000">
+          </div>
+          <div class="field">
+            <label>Training/Change (one-time)</label>
+            <input type="text" id="trainOneTime" value="50,000">
+          </div>
+          <div class="field">
+            <label>Internal resourcing (annual)</label>
+            <input type="text" id="internalAnnual" value="30,000">
+          </div>
+          <div class="field">
+            <label>Other incremental platform (annual)</label>
+            <input type="text" id="platformAnnual" value="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="row" style="justify-content:space-between"><h3>Qualitative Metrics</h3><span class="pill">Perception</span></div>
+        <div class="inputs full">
+          <div class="field">
+            <label>Risk reduction</label>
+            <input type="range" id="qRisk" min="1" max="5" value="4">
+          </div>
+          <div class="field">
+            <label>Compliance & audit readiness</label>
+            <input type="range" id="qCompliance" min="1" max="5" value="4">
+          </div>
+          <div class="field">
+            <label>Decision speed</label>
+            <input type="range" id="qSpeed" min="1" max="5" value="4">
+          </div>
+          <div class="field">
+            <label>Data quality</label>
+            <input type="range" id="qData" min="1" max="5" value="4">
+          </div>
+          <div class="field">
+            <label>User satisfaction</label>
+            <input type="range" id="qSatisfaction" min="1" max="5" value="4">
+          </div>
+          <div class="field">
+            <label>Vendor support</label>
+            <input type="range" id="qSupport" min="1" max="5" value="4">
+          </div>
+        </div>
+        <div class="tip">Qualitative Value Index = average of above (scaled to 100).</div>
+      </div>
+    </aside>
+
+    <main>
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <h4>Cash Flow Over Time</h4>
+          <div class="legend">Positive = net benefit | Negative = investment</div>
+        </div>
+        <canvas id="cfChart" height="130"></canvas>
+      </div>
+      <div class="row" style="gap:var(--grid-gap); margin-top:var(--grid-gap)">
+        <div class="card" style="flex:1">
+          <div class="row" style="justify-content:space-between">
+            <h4>Annual Benefits Breakdown (at full adoption)</h4>
+            <div class="legend">100% adoption, undiscounted</div>
+          </div>
+          <canvas id="benefitChart" height="140"></canvas>
+          <div class="divider"></div>
+          <div class="row">
+            <span class="pill">Efficiency</span>
+            <span class="pill">Error reduction</span>
+            <span class="pill">Compliance</span>
+            <span class="pill">Working capital</span>
+            <span class="pill">Revenue leakage</span>
+            <span class="pill" style="background:rgba(255,255,255,0.08)">Annual costs</span>
+          </div>
+        </div>
+        <div class="card" style="flex:1">
+          <div class="row" style="justify-content:space-between">
+            <h4>Sensitivity (NPV impact)</h4>
+            <div class="legend">±20% change in key drivers</div>
+          </div>
+          <canvas id="sensChart" height="140"></canvas>
+        </div>
+      </div>
+
+      <div class="row" style="gap:var(--grid-gap); margin-top:var(--grid-gap)">
+        <div class="card" style="flex:1">
+          <div class="row" style="justify-content:space-between">
+            <h4>Qualitative Value Radar</h4>
+            <div class="legend">Stakeholder-perceived value</div>
+          </div>
+          <canvas id="radarChart" height="160"></canvas>
+        </div>
+        <div class="card" style="flex:1">
+          <div class="row" style="justify-content:space-between">
+            <h4>Scenario Compare</h4>
+            <div class="sc-actions">
+              <button id="saveA">Save as A</button>
+              <button id="saveB">Save as B</button>
+              <button id="applyA">Apply A</button>
+              <button id="applyB">Apply B</button>
+            </div>
+          </div>
+          <div class="scenario-block">
+            <div class="scenario">
+              <h5>Scenario A</h5>
+              <div class="row" style="justify-content:space-between">
+                <span class="label">ROI</span><span class="sval" id="scA_roi">—</span>
+              </div>
+              <div class="row" style="justify-content:space-between">
+                <span class="label">NPV</span><span class="sval" id="scA_npv">—</span>
+              </div>
+              <div class="row" style="justify-content:space-between">
+                <span class="label">Payback</span><span class="sval" id="scA_pay">—</span>
+              </div>
+              <div class="row" style="justify-content:space-between">
+                <span class="label">Q-Index</span><span class="sval" id="scA_q">—</span>
+              </div>
+            </div>
+            <div class="scenario">
+              <h5>Scenario B</h5>
+              <div class="row" style="justify-content:space-between">
+                <span class="label">ROI</span><span class="sval" id="scB_roi">—</span>
+              </div>
+              <div class="row" style="justify-content:space-between">
+                <span class="label">NPV</span><span class="sval" id="scB_npv">—</span>
+              </div>
+              <div class="row" style="justify-content:space-between">
+                <span class="label">Payback</span><span class="sval" id="scB_pay">—</span>
+              </div>
+              <div class="row" style="justify-content:space-between">
+                <span class="label">Q-Index</span><span class="sval" id="scB_q">—</span>
+              </div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="row">
+            <span class="pill">Tip</span>
+            <span class="monosmall">Use presets for fast what-if comparisons.</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <div class="note">
+    Notes:
+    - ROI shown is total over the selected horizon, undiscounted. NPV/IRR incorporate the discount rate. Adoption percentages scale realized benefits.
+    - Working capital benefit approximates financial value of DSO reduction: AR × (days reduced/365) × cost of capital.
+    - Revenue leakage prevention is subject to realization; adjust the % to your context.
+  </div>
+
+  <div class="foot">
+    This dashboard is for demonstration; use your best-estimate assumptions and align with Finance policy for investment decisions.
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script>
+    // Utility helpers
+    const $ = sel => document.querySelector(sel);
+    const fmtCurrency = (n, sym) => {
+      if (isNaN(n)) return `${sym}0`;
+      const sign = n < 0 ? "-" : "";
+      n = Math.abs(n);
+      return `${sign}${sym}${n.toLocaleString(undefined, {maximumFractionDigits:0})}`;
+    };
+    const fmtPct = (x, digits=0) => isNaN(x) ? "—" : `${x.toFixed(digits)}%`;
+    const parseNum = v => {
+      if (typeof v === "number") return v;
+      if (!v) return 0;
+      return parseFloat(String(v).replace(/[, $€£₹R₨]/g, "")) || 0;
+    };
+
+    // Global currency symbol for dynamic chart callbacks
+    let CURR_SYM = '$';
+
+    // Get inputs
+    function getInputs() {
+      const horizon = Math.min(5, Math.max(1, parseInt($('#horizon').value || 3)));
+      const adoptions = [
+        Math.min(100, parseNum($('#adoptY1').value))/100,
+        Math.min(100, parseNum($('#adoptY2').value))/100,
+        Math.min(100, parseNum($('#adoptY3').value))/100,
+        Math.min(100, parseNum($('#adoptY4').value))/100,
+        Math.min(100, parseNum($('#adoptY5').value))/100,
+      ].slice(0, horizon);
+
+      return {
+        currency: $('#currency').value,
+        horizon,
+        discountRate: Math.max(0, parseNum($('#discountRate').value))/100,
+        paybackTarget: Math.max(1, parseNum($('#paybackTarget').value)),
+        adoptions,
+        fte: parseNum($('#fte').value),
+        fteCost: parseNum($('#fteCost').value),
+        hrsSaved: parseNum($('#hrsSaved').value),
+        hrsPerYear: parseNum($('#hrsPerYear').value),
+        txPerMonth: parseNum($('#txPerMonth').value),
+        errorRate: parseNum($('#errorRate').value)/100,
+        errorReduction: parseNum($('#errorReduction').value)/100,
+        costPerError: parseNum($('#costPerError').value),
+        annualFines: parseNum($('#annualFines').value),
+        fineReduction: parseNum($('#fineReduction').value)/100,
+        arBalance: parseNum($('#arBalance').value),
+        dsoReduction: parseNum($('#dsoReduction').value),
+        costOfCapital: parseNum($('#costOfCapital').value)/100,
+        annualRevenue: parseNum($('#annualRevenue').value),
+        revLeakagePrevented: parseNum($('#revLeakagePrevented').value)/100,
+        revRealization: parseNum($('#revRealization').value)/100,
+        subAnnual: parseNum($('#subAnnual').value),
+        maintAnnual: parseNum($('#maintAnnual').value),
+        implOneTime: parseNum($('#implOneTime').value),
+        trainOneTime: parseNum($('#trainOneTime').value),
+        internalAnnual: parseNum($('#internalAnnual').value),
+        platformAnnual: parseNum($('#platformAnnual').value),
+        q: {
+          risk: parseNum($('#qRisk').value),
+          compliance: parseNum($('#qCompliance').value),
+          speed: parseNum($('#qSpeed').value),
+          data: parseNum($('#qData').value),
+          satisfaction: parseNum($('#qSatisfaction').value),
+          support: parseNum($('#qSupport').value),
+        }
+      };
+    }
+
+    // Core calculations
+    function computeAnnualBenefitsAtFull(inputs) {
+      const hourlyCost = inputs.fteCost / Math.max(1, inputs.hrsPerYear);
+      const efficiency = (inputs.fte * inputs.hrsSaved * 52) * hourlyCost;
+
+      const errorsPerYear = inputs.txPerMonth * 12 * inputs.errorRate;
+      const errorsAvoided = errorsPerYear * inputs.errorReduction;
+      const errorReductionSavings = errorsAvoided * inputs.costPerError;
+
+      const complianceSavings = inputs.annualFines * inputs.fineReduction;
+
+      const workingCapital = inputs.arBalance * (Math.max(0, inputs.dsoReduction)/365) * inputs.costOfCapital;
+
+      const revenueLeakage = inputs.annualRevenue * inputs.revLeakagePrevented * inputs.revRealization;
+
+      return {
+        efficiency,
+        errorReductionSavings,
+        complianceSavings,
+        workingCapital,
+        revenueLeakage,
+        total: efficiency + errorReductionSavings + complianceSavings + workingCapital + revenueLeakage
+      };
+    }
+
+    function computeAnnualRecurringCosts(inputs){
+      return (inputs.subAnnual + inputs.maintAnnual + inputs.internalAnnual + inputs.platformAnnual);
+    }
+
+    function computeCashFlows(inputs){
+      const fullBenefits = computeAnnualBenefitsAtFull(inputs);
+      const recCosts = computeAnnualRecurringCosts(inputs);
+
+      const years = [];
+      const benefits = [];
+      const costs = [];
+      const net = [];
+
+      for (let y=0; y<inputs.horizon; y++){
+        const adoption = inputs.adoptions[Math.min(y, inputs.adoptions.length-1)] || 1;
+        const b = fullBenefits.total * adoption;
+        const c = recCosts;
+        const n = b - c;
+        years.push(`Y${y+1}`);
+        benefits.push(b);
+        costs.push(c);
+        net.push(n);
+      }
+
+      // Initial investment cash flow (Year 0)
+      const initial = (inputs.implOneTime + inputs.trainOneTime) * -1;
+      return {years, benefits, costs, net, initial, fullBenefits, recCosts};
+    }
+
+    // Excel-conformant NPV: sum of discounted Y1..Yn plus undiscounted Y0
+    function npv(rate, cfs){
+      let total = 0;
+      if (cfs.length > 0) total += cfs[0]; // t=0
+      for (let t=1; t<cfs.length; t++){
+        total += cfs[t] / Math.pow(1+rate, t);
+      }
+      return total;
+    }
+
+    function irr(cfs){
+      // Robust bisection between -0.99 and 10 (1000%)
+      let low = -0.99, high = 10, mid;
+      const f = r => npv(r, cfs);
+      let fLow = f(low), fHigh = f(high);
+      if (isNaN(fLow) || isNaN(fHigh)) return NaN;
+      if (fLow * fHigh > 0){
+        return NaN; // no sign change
+      }
+      for (let i=0;i<80;i++){
+        mid = (low + high)/2;
+        const fMid = f(mid);
+        if (Math.abs(fMid) < 1e-7) break;
+        if (fLow * fMid < 0){ high = mid; fHigh = fMid; }
+        else { low = mid; fLow = fMid; }
+      }
+      return mid;
+    }
+
+    function paybackPeriodMonths(cfs){
+      // cfs includes t0 initial (likely negative)
+      let cum = 0;
+      for (let i=0; i<cfs.length; i++){
+        const prev = cum;
+        cum += cfs[i];
+        if (cum >= 0){
+          if (i === 0) return 0;
+          // linear interpolation within year i-1 to i
+          const needed = -prev;
+          const within = cfs[i] !== 0 ? (needed / cfs[i]) : 1;
+          const months = (i-1 + within) * 12;
+          return Math.max(0, months);
+        }
+      }
+      return Infinity;
+    }
+
+    // Charts
+    let cfChart, benefitChart, sensChart, radarChart;
+
+    function updateCharts(inputs, cf, kpis){
+      // Cash flow chart
+      const labels = ['Y0', ...cf.years];
+      const cfData = [cf.initial, ...cf.net];
+      const benData = [0, ...cf.benefits];
+      const costData = [-(inputs.implOneTime + inputs.trainOneTime), ...cf.costs.map(c=>-c)];
+
+      if (!cfChart){
+        const ctx = document.getElementById('cfChart').getContext('2d');
+        cfChart = new Chart(ctx, {
+          type:'bar',
+          data:{
+            labels,
+            datasets:[
+              {label:'Net Cash Flow', data: cfData, backgroundColor: cfData.map(v=> v>=0 ? 'rgba(107,230,117,0.6)' : 'rgba(255,110,110,0.7)'), borderRadius:6},
+              {label:'Benefits', data: benData, backgroundColor:'rgba(92,209,255,0.35)', borderRadius:6},
+              {label:'Costs', data: costData, backgroundColor:'rgba(255,110,110,0.35)', borderRadius:6},
+            ]
+          },
+          options:{
+            responsive:true,
+            plugins:{
+              legend:{display:true, labels:{color:'#cfd6ee'}},
+              tooltip:{callbacks:{label: ctx=>{
+                return `${ctx.dataset.label}: ${fmtCurrency(ctx.parsed.y, CURR_SYM)}`
+              }}}
+            },
+            scales:{
+              x:{ticks:{color:'#cbd4f0'}, grid:{color:'rgba(255,255,255,0.05)'}},
+              y:{ticks:{color:'#cbd4f0', callback:(v)=>fmtCurrency(v, CURR_SYM)}, grid:{color:'rgba(255,255,255,0.05)'}}
+            }
+          }
+        });
+      } else {
+        cfChart.data.labels = labels;
+        cfChart.data.datasets[0].data = cfData;
+        cfChart.data.datasets[0].backgroundColor = cfData.map(v=> v>=0 ? 'rgba(107,230,117,0.6)' : 'rgba(255,110,110,0.7)');
+        cfChart.data.datasets[1].data = benData;
+        cfChart.data.datasets[2].data = costData;
+        cfChart.update();
+      }
+
+      // Benefits breakdown
+      const b = cf.fullBenefits;
+      const cats = ['Efficiency','Error reduction','Compliance','Working capital','Revenue leakage','Annual costs'];
+      const vals = [b.efficiency, b.errorReductionSavings, b.complianceSavings, b.workingCapital, b.revenueLeakage, -cf.recCosts];
+      if (!benefitChart){
+        const ctx2 = document.getElementById('benefitChart').getContext('2d');
+        benefitChart = new Chart(ctx2, {
+          type:'bar',
+          data:{ labels: cats, datasets:[{
+            label:'Annual Impact',
+            data: vals,
+            backgroundColor: vals.map(v=> v>=0 ? 'rgba(90,220,150,0.65)' : 'rgba(255,120,120,0.7)'),
+            borderRadius:8
+          }]},
+          options:{
+            indexAxis:'y',
+            plugins:{legend:{display:false}, tooltip:{callbacks:{label: c=>fmtCurrency(c.parsed.x, CURR_SYM)}}},
+            scales:{
+              x:{ticks:{color:'#cbd4f0', callback:v=>fmtCurrency(v,CURR_SYM)}, grid:{color:'rgba(255,255,255,0.06)'}},
+              y:{ticks:{color:'#cbd4f0'}, grid:{color:'rgba(255,255,255,0.06)'}}
+            }
+          }
+        });
+      } else {
+        benefitChart.data.datasets[0].data = vals;
+        benefitChart.data.datasets[0].backgroundColor = vals.map(v=> v>=0 ? 'rgba(90,220,150,0.65)' : 'rgba(255,120,120,0.7)');
+        benefitChart.update();
+      }
+
+      // Sensitivity chart
+      const sens = computeSensitivity(inputs);
+      const sensLabels = sens.map(s=>s.name);
+      const lowVals = sens.map(s=>s.low - kpis.npv);
+      const highVals = sens.map(s=>s.high - kpis.npv);
+      if (!sensChart){
+        const ctx3 = document.getElementById('sensChart').getContext('2d');
+        sensChart = new Chart(ctx3, {
+          type:'bar',
+          data:{
+            labels: sensLabels,
+            datasets:[
+              {label:'Low (−20%)', data: lowVals, backgroundColor:'rgba(255,184,77,0.7)', borderRadius:6},
+              {label:'High (+20%)', data: highVals, backgroundColor:'rgba(122,92,255,0.7)', borderRadius:6}
+            ]
+          },
+          options:{
+            indexAxis:'y',
+            plugins:{legend:{labels:{color:'#cfd6ee'}}, tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${fmtCurrency(c.parsed.x, CURR_SYM)}`}}},
+            scales:{
+              x:{ticks:{color:'#cbd4f0', callback:v=>fmtCurrency(v, CURR_SYM)}, grid:{color:'rgba(255,255,255,0.05)'}},
+              y:{ticks:{color:'#cbd4f0'}, grid:{color:'rgba(255,255,255,0.05)'}}
+            }
+          }
+        });
+      } else {
+        sensChart.data.labels = sensLabels;
+        sensChart.data.datasets[0].data = lowVals;
+        sensChart.data.datasets[1].data = highVals;
+        sensChart.update();
+      }
+
+      // Radar chart
+      const qVals = [inputs.q.risk, inputs.q.compliance, inputs.q.speed, inputs.q.data, inputs.q.satisfaction, inputs.q.support];
+      if (!radarChart){
+        const ctx4 = document.getElementById('radarChart').getContext('2d');
+        radarChart = new Chart(ctx4, {
+          type:'radar',
+          data:{
+            labels:['Risk','Compliance','Speed','Data','Satisfaction','Support'],
+            datasets: [{
+              label:'Qualitative Index (1-5)',
+              data: qVals,
+              fill:true,
+              backgroundColor:'rgba(92,209,255,0.25)',
+              borderColor:'#5cd1ff',
+              pointBackgroundColor:'#5cd1ff'
+            }]
+          },
+          options:{
+            scales:{
+              r:{
+                angleLines:{color:'rgba(255,255,255,0.1)'},
+                grid:{color:'rgba(255,255,255,0.1)'},
+                suggestedMin:1, suggestedMax:5,
+                ticks:{display:false}
+              }
+            },
+            plugins:{legend:{labels:{color:'#cfd6ee'}}}
+          }
+        });
+      } else {
+        radarChart.data.datasets[0].data = qVals;
+        radarChart.update();
+      }
+    }
+
+    function computeKPIs(inputs, cf){
+      const cfs = [cf.initial, ...cf.net];
+      const dr = inputs.discountRate;
+      const npvVal = npv(dr, cfs);
+      const irrVal = irr(cfs);
+      const months = paybackPeriodMonths(cfs);
+      const paybackTxt = months === Infinity ? "No payback" : `${(months/12).toFixed(1)} yrs (${Math.round(months)} mo)`;
+      const totalBenefits = cf.benefits.reduce((a,b)=>a+b,0);
+      const initialCost = -(cf.initial);
+      const recurringCosts = cf.costs.reduce((a,b)=>a+b,0);
+      const totalCosts = initialCost + recurringCosts;
+      const totalROI = totalCosts > 0 ? ((totalBenefits - recurringCosts - initialCost) / totalCosts) * 100 : NaN;
+      const anb = (cf.net[0] ?? 0);
+
+      // Qualitative score
+      const qScore = (inputs.q.risk + inputs.q.compliance + inputs.q.speed + inputs.q.data + inputs.q.satisfaction + inputs.q.support)/6/5*100;
+
+      return { npv: npvVal, irr: irrVal, paybackMonths: months, paybackTxt, roi: totalROI, anb, qScore };
+    }
+
+    function updateKPICards(inputs, kpis){
+      const sym = inputs.currency;
+
+      // ROI KPI removed from UI; guard in case elements exist
+      const roiEl = $('#kpiRoi');
+      if (roiEl){
+        roiEl.textContent = isFinite(kpis.roi) ? fmtPct(kpis.roi, 0) : '—';
+        const roiNote = $('#kpiRoiNote');
+        if (roiNote) roiNote.textContent = `Horizon: ${inputs.horizon} yrs`;
+      }
+
+      const npvEl = $('#kpiNPV');
+      if (npvEl) npvEl.textContent = fmtCurrency(kpis.npv, sym);
+      const drEl = $('#kpiDR');
+      if (drEl) drEl.textContent = fmtPct(inputs.discountRate*100, 1);
+
+      $('#kpiIRR').textContent = isNaN(kpis.irr) ? '—' : fmtPct(kpis.irr*100, 1);
+      $('#kpiPayback').textContent = kpis.paybackTxt;
+
+      $('#kpiANB').textContent = fmtCurrency(kpis.anb, sym);
+      $('#kpiANBNote').textContent = `At adoption: ${Math.round((getInputs().adoptions[0]||0)*100)}%`;
+
+      $('#kpiQScore').textContent = `${kpis.qScore.toFixed(0)}/100`;
+      $('#kpiQNote').textContent = qualitativeNarrative(kpis.qScore);
+
+      const tgtEl = $('#kpiPayTarget');
+      if (tgtEl) tgtEl.textContent = `≤ ${Math.round(inputs.paybackTarget)} months`;
+    }
+
+    function qualitativeNarrative(score){
+      if (score >= 85) return "Exceptional perceived value";
+      if (score >= 70) return "Strong stakeholder alignment";
+      if (score >= 55) return "Moderate perceived value";
+      return "Requires change management focus";
+    }
+
+    function computeSensitivity(inputs){
+      const baseCF = computeCashFlows(inputs);
+      const baseNPV = computeKPIs(inputs, baseCF).npv;
+
+      const variants = [
+        { name: 'Hours saved', mutate: (inp, k)=>{ inp.hrsSaved *= k; } },
+        { name: 'Adoption', mutate: (inp, k)=>{ inp.adoptions = inp.adoptions.map(a=>Math.min(1, a*k)); } },
+        { name: 'DSO reduction', mutate: (inp, k)=>{ inp.dsoReduction *= k; } },
+        { name: 'Error reduction %', mutate: (inp, k)=>{ inp.errorReduction = Math.min(1, inp.errorReduction*k); } },
+        { name: 'Discount rate', mutate: (inp, k)=>{ inp.discountRate = Math.max(0, inp.discountRate * (k===0.8?0.8:1.2)); } },
+      ];
+
+      return variants.map(v=>{
+        const lowInp = structuredClone(inputs);
+        v.mutate(lowInp, 0.8);
+        const lowNPV = computeKPIs(lowInp, computeCashFlows(lowInp)).npv;
+
+        const highInp = structuredClone(inputs);
+        v.mutate(highInp, 1.2);
+        const highNPV = computeKPIs(highInp, computeCashFlows(highInp)).npv;
+
+        return {name: v.name, low: lowNPV, high: highNPV, base: baseNPV};
+      });
+    }
+
+    // Scenario management
+    let scenarioA = null, scenarioB = null;
+    function saveScenario(which){
+      const inputs = getInputs();
+      const cf = computeCashFlows(inputs);
+      const kpis = computeKPIs(inputs, cf);
+      const sc = {
+        inputs, kpis,
+        snapshot: {
+          roi: isFinite(kpis.roi) ? `${kpis.roi.toFixed(0)}%` : '—',
+          npv: fmtCurrency(kpis.npv, inputs.currency),
+          pay: kpis.paybackTxt,
+          q: `${kpis.qScore.toFixed(0)}/100`
+        }
+      };
+      if (which==='A'){ scenarioA = sc; $('#scA_roi').textContent = sc.snapshot.roi; $('#scA_npv').textContent = sc.snapshot.npv; $('#scA_pay').textContent = sc.snapshot.pay; $('#scA_q').textContent = sc.snapshot.q; }
+      if (which==='B'){ scenarioB = sc; $('#scB_roi').textContent = sc.snapshot.roi; $('#scB_npv').textContent = sc.snapshot.npv; $('#scB_pay').textContent = sc.snapshot.pay; $('#scB_q').textContent = sc.snapshot.q; }
+    }
+    function applyScenario(which){
+      const sc = which==='A' ? scenarioA : scenarioB;
+      if (!sc) return;
+      setInputs(sc.inputs);
+      recalc();
+    }
+    function setInputs(inp){
+      $('#currency').value = inp.currency;
+      $('#horizon').value = inp.horizon;
+      $('#discountRate').value = (inp.discountRate*100).toFixed(1);
+      $('#paybackTarget').value = Math.round(inp.paybackTarget);
+      const ad = inp.adoptions;
+      $('#adoptY1').value = Math.round((ad[0]||1)*100);
+      $('#adoptY2').value = Math.round((ad[1]||1)*100);
+      $('#adoptY3').value = Math.round((ad[2]||1)*100);
+      $('#adoptY4').value = Math.round((ad[3]||1)*100);
+      $('#adoptY5').value = Math.round((ad[4]||1)*100);
+
+      $('#fte').value = inp.fte;
+      $('#fteCost').value = Math.round(inp.fteCost).toLocaleString();
+      $('#hrsSaved').value = inp.hrsSaved;
+      $('#hrsPerYear').value = inp.hrsPerYear;
+
+      $('#txPerMonth').value = inp.txPerMonth;
+      $('#errorRate').value = (inp.errorRate*100).toFixed(2);
+      $('#errorReduction').value = (inp.errorReduction*100).toFixed(2);
+      $('#costPerError').value = Math.round(inp.costPerError).toLocaleString();
+      $('#annualFines').value = Math.round(inp.annualFines).toLocaleString();
+      $('#fineReduction').value = (inp.fineReduction*100).toFixed(0);
+
+      $('#arBalance').value = Math.round(inp.arBalance).toLocaleString();
+      $('#dsoReduction').value = inp.dsoReduction;
+      $('#costOfCapital').value = (inp.costOfCapital*100).toFixed(1);
+      $('#annualRevenue').value = Math.round(inp.annualRevenue).toLocaleString();
+      $('#revLeakagePrevented').value = (inp.revLeakagePrevented*100).toFixed(2);
+      $('#revRealization').value = (inp.revRealization*100).toFixed(0);
+
+      $('#subAnnual').value = Math.round(inp.subAnnual).toLocaleString();
+      $('#maintAnnual').value = Math.round(inp.maintAnnual).toLocaleString();
+      $('#implOneTime').value = Math.round(inp.implOneTime).toLocaleString();
+      $('#trainOneTime').value = Math.round(inp.trainOneTime).toLocaleString();
+      $('#internalAnnual').value = Math.round(inp.internalAnnual).toLocaleString();
+      $('#platformAnnual').value = Math.round(inp.platformAnnual).toLocaleString();
+
+      $('#qRisk').value = inp.q.risk;
+      $('#qCompliance').value = inp.q.compliance;
+      $('#qSpeed').value = inp.q.speed;
+      $('#qData').value = inp.q.data;
+      $('#qSatisfaction').value = inp.q.satisfaction;
+      $('#qSupport').value = inp.q.support;
+
+      toggleAdoptionFields();
+    }
+
+    // Presets
+    function applyPreset(name){
+      const base = {
+        currency: "$",
+        horizon: 3,
+        discountRate: 0.10,
+        paybackTarget: 18,
+        adoptions: [0.7,0.9,1.0],
+        fte: 20,
+        fteCost: 120000,
+        hrsSaved: 4,
+        hrsPerYear: 2080,
+        txPerMonth: 50000,
+        errorRate: 0.02,
+        errorReduction: 0.5,
+        costPerError: 50,
+        annualFines: 200000,
+        fineReduction: 0.6,
+        arBalance: 50000000,
+        dsoReduction: 5,
+        costOfCapital: 0.08,
+        annualRevenue: 200000000,
+        revLeakagePrevented: 0.002,
+        revRealization: 0.75,
+        subAnnual: 350000,
+        maintAnnual: 50000,
+        implOneTime: 250000,
+        trainOneTime: 50000,
+        internalAnnual: 30000,
+        platformAnnual: 0,
+        q: {risk:4,compliance:4,speed:4,data:4,satisfaction:4,support:4}
+      };
+      if (name==='Conservative'){
+        base.hrsSaved = 2.5;
+        base.errorReduction = 0.35;
+        base.fineReduction = 0.4;
+        base.dsoReduction = 3;
+        base.revLeakagePrevented = 0.001;
+        base.revRealization = 0.6;
+        base.discountRate = 0.12;
+        base.adoptions = [0.5, 0.75, 0.9];
+        base.q = {risk:3,compliance:4,speed:3,data:4,satisfaction:3,support:4};
+      }
+      if (name==='Aggressive'){
+        base.hrsSaved = 6;
+        base.errorReduction = 0.7;
+        base.fineReduction = 0.8;
+        base.dsoReduction = 8;
+        base.revLeakagePrevented = 0.004;
+        base.revRealization = 0.9;
+        base.discountRate = 0.08;
+        base.adoptions = [0.8, 1.0, 1.0];
+        base.q = {risk:5,compliance:5,speed:5,data:5,satisfaction:4,support:5};
+      }
+      setInputs(base);
+      recalc();
+    }
+
+    // Export
+    async function exportPNG(){
+      const node = document.body;
+      const btn = $('#btnExport');
+      const old = btn.textContent;
+      btn.textContent = 'Rendering...';
+      btn.disabled = true;
+      await html2canvas(node, {backgroundColor:'#0f1220', scale:2, windowWidth: document.documentElement.scrollWidth, windowHeight: document.documentElement.scrollHeight})
+        .then(canvas=>{
+          const link = document.createElement('a');
+          link.download = 'cfo-roi-dashboard.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        })
+        .catch(()=>{})
+        .finally(()=>{btn.textContent = old; btn.disabled=false;});
+    }
+
+    // UI wiring
+    function toggleAdoptionFields(){
+      const horizon = Math.min(5, Math.max(1, parseInt($('#horizon').value || 3)));
+      $('#adoptY4Wrap').style.display = horizon >= 4 ? '' : 'none';
+      $('#adoptY5Wrap').style.display = horizon >= 5 ? '' : 'none';
+    }
+
+    function recalc(){
+      toggleAdoptionFields();
+      const inputs = getInputs();
+      CURR_SYM = inputs.currency; // keep chart currency in sync globally
+      const cf = computeCashFlows(inputs);
+      const kpis = computeKPIs(inputs, cf);
+      updateKPICards(inputs, kpis);
+      updateCharts(inputs, cf, kpis);
+    }
+
+    function attachEvents(){
+      document.querySelectorAll('input, select').forEach(el=>{
+        el.addEventListener('input', ()=>recalc());
+        el.addEventListener('change', ()=>recalc());
+      });
+      $('#btnBase').addEventListener('click', ()=>applyPreset('Base'));
+      $('#btnConservative').addEventListener('click', ()=>applyPreset('Conservative'));
+      $('#btnAggressive').addEventListener('click', ()=>applyPreset('Aggressive'));
+      $('#btnReset').addEventListener('click', ()=>{applyPreset('Base')});
+      $('#btnExport').addEventListener('click', exportPNG);
+      $('#saveA').addEventListener('click', ()=>saveScenario('A'));
+      $('#saveB').addEventListener('click', ()=>saveScenario('B'));
+      $('#applyA').addEventListener('click', ()=>applyScenario('A'));
+      $('#applyB').addEventListener('click', ()=>applyScenario('B'));
+    }
+
+    // Init
+    window.addEventListener('DOMContentLoaded', ()=>{
+      attachEvents();
+      applyPreset('Base');
+    });
+  </script>
+</body>
+</html>
